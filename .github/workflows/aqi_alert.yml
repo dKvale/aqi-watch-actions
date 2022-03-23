@@ -1,6 +1,6 @@
 # This is a basic workflow to help you get started with Actions
 
-name: CI
+name: aqi_alert
 
 # Controls when the workflow will run
 on:
@@ -27,31 +27,11 @@ jobs:
 
       - uses: r-lib/actions/setup-renv@v1
       
-      - name: Query dependencies
-        run: |
-          install.packages('remotes')
-          saveRDS(remotes::dev_package_deps(dependencies = TRUE), ".github/depends.Rds", version = 2)
-        shell: Rscript {0}
-      
       - name: Install packages missed by renv
         run: |
           install.packages(c("rmarkdown", "pander", "readr", "stringr", "dplyr"))
-          saveRDS(remotes::dev_package_deps(dependencies = TRUE), ".github/depends.Rds", version = 2)
-          writeLines(sprintf("R-%i.%i", getRversion()$major, getRversion()$minor), ".github/R-version")
         shell: Rscript {0}
 
-      - name: Cache R packages
-        uses: actions/cache@v1
-        with:
-          path: ${{ env.R_LIBS_USER }}
-          key: ${{ runner.os }}-${{ hashFiles('.github/R-version') }}-1-${{ hashFiles('.github/depends.Rds') }}
-          restore-keys: ${{ runner.os }}-${{ hashFiles('.github/R-version') }}-1-
-
-      - name: Install dependencies
-        run: |
-          remotes::install_deps(dependencies = TRUE)
-        shell: Rscript {0}
-        
       - name: Check AQI
         run: |
           source("R/aqi_watch.R")
@@ -60,7 +40,7 @@ jobs:
       - name: Cache site results
         uses: actions/cache@v2
         with:
-          path: _site_files
+          path: web
           key: site-${{ hashFiles('**/*Rmd') }}
           restore-keys: site-
 
