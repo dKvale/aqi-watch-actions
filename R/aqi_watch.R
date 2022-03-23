@@ -481,29 +481,29 @@ aqi_rank <- group_by(aqi, AqsID) %>% arrange(-AQI_Value) %>% mutate(rank = 1:n()
 
 aqi_rank <- filter(ungroup(aqi_rank), rank == 1) %>% arrange(-AQI_Value)
 
-# Create high sites table
-setwd("web")
+# Save high sites table to test for changes on next cycle
+saveRDS(aqi, "data/aqi_previous.Rdata")
 
-rmarkdown::render_site("index.Rmd")
-rmarkdown::render_site("todays_obs.Rmd")
-rmarkdown::render_site("daily_history.Rmd")
-rmarkdown::render_site("week_review.Rmd")
+# Create high sites table
+#setwd("web")
+
+rmarkdown::render_site("web/index.Rmd")
+rmarkdown::render_site("web/todays_obs.Rmd")
+rmarkdown::render_site("web/daily_history.Rmd")
+rmarkdown::render_site("web/week_review.Rmd")
 
 if (watch_time) {
-  rmarkdown::render_site("model_perf.Rmd")
+  rmarkdown::render_site("web/model_perf.Rmd")
 }
 
 if (FALSE) {
-  rmarkdown::render_site("airnow_map.Rmd")
-  rmarkdown::render_site("smogwatch.Rmd")
+  rmarkdown::render_site("web/airnow_map.Rmd")
+  rmarkdown::render_site("web/smogwatch.Rmd")
 }
 
 #setwd("../")
-
 #system("sudo cp -a ~/aqi-watch/web/_site/.  ../../../../usr/share/nginx/html/")
 
-# Save high sites table to test for changes on next cycle
-saveRDS(aqi, "data/aqi_previous.Rdata")
 
 # Clean house
 rm(aqi)
