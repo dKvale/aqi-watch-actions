@@ -500,7 +500,7 @@ if (FALSE) {
 #system("sudo cp -a ~/aqi-watch/web/_site/.  ../../../../usr/share/nginx/html/")
 
 # Save high sites table to test for changes on next cycle
-write.csv(aqi, "data/aqi_previous.csv", row.names = F)
+saveRDS(aqi, "data/aqi_previous.Rdata")
 
 # Clean house
 rm(aqi)
