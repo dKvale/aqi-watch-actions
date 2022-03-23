@@ -36,7 +36,7 @@ year <- format(Sys.Date(), "%Y")
 daylight_savings <- Sys.Date() > as.Date(paste0(year, "-03-12")) & Sys.Date() < as.Date(paste0(year, "-10-6"))
 
 # Load credentials
-credentials <- read_csv("../credentials.csv")
+#credentials <- read_csv("../credentials.csv")
 
 gmt_time <-  (as.numeric(format(Sys.time() - 195, tz="GMT", "%H")) - 1) %% 24
 
