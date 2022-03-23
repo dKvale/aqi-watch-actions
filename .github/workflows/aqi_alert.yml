@@ -4,35 +4,62 @@ name: CI
 
 # Controls when the workflow will run
 on:
-  schedule:
-    - cron:  '30 * * * *'  # At every 30 minutes past the hour
+  #schedule:
+  #  - cron:  '30 * * * *'  # At every 30 minutes past the hour
+    
   # Triggers the workflow on push or pull request events but only for the main branch
   push:
     branches: [ main ]
-  pull_request:
-    branches: [ main ]
 
-  # Allows you to run this workflow manually from the Actions tab
-  workflow_dispatch:
-
-# A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
-  # This workflow contains a single job called "build"
-  build:
-    # The type of runner that the job will run on
+  site:
     runs-on: ubuntu-latest
-
-    # Steps represent a sequence of tasks that will be executed as part of the job
+    env:
+      GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
     steps:
-      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v2
 
-      # Runs a single command using the runners shell
-      - name: Run a one-line script
-        run: echo Hello, world!
+      - uses: r-lib/actions/setup-pandoc@v1
 
-      # Runs a set of commands using the runners shell
-      - name: Run a multi-line script
+      - uses: r-lib/actions/setup-r@v1
+        with:
+          use-public-rspm: true
+
+      - uses: r-lib/actions/setup-renv@v1
+      
+      - name: Install packages missed by renv
         run: |
-          echo Add other actions to build,
-          echo test, and deploy your project.
+          R -e 'install.packages("rmarkdown", "pander", "readr", "stringr", "dplyr")'
+          saveRDS(remotes::dev_package_deps(dependencies = TRUE), ".github/depends.Rds", version = 2)
+          writeLines(sprintf("R-%i.%i", getRversion()$major, getRversion()$minor), ".github/R-version")
+        shell: Rscript {0}
+
+      - name: Cache R packages
+        uses: actions/cache@v1
+        with:
+          path: ${{ env.R_LIBS_USER }}
+          key: ${{ runner.os }}-${{ hashFiles('.github/R-version') }}-1-${{ hashFiles('.github/depends.Rds') }}
+          restore-keys: ${{ runner.os }}-${{ hashFiles('.github/R-version') }}-1-
+
+      - name: Install dependencies
+        run: |
+          remotes::install_deps(dependencies = TRUE)
+        shell: Rscript {0}
+        
+      - name: Check AQI
+        run: |
+          source("R/aqi_watch.R")
+        shell: Rscript {0} 
+
+      - name: Cache site results
+        uses: actions/cache@v2
+        with:
+          path: _site_files
+          key: site-${{ hashFiles('**/*Rmd') }}
+          restore-keys: site-
+
+      - name: Deploy to GitHub pages 🚀
+        uses: JamesIves/github-pages-deploy-action@4.1.4
+        with:
+          branch: main
+          folder: _site
