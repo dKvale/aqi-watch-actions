@@ -36,7 +36,7 @@ jobs:
         
       - uses: actions/cache@v2
         with:
-          path: ~/.local/share/renv
+          path: ${{ env.RENV_PATHS_ROOT }}
           key: ${{ runner.os }}-renv-${{ hashFiles('**/renv.lock') }}
           restore-keys: |
             ${{ runner.os }}-renv-
@@ -68,8 +68,21 @@ jobs:
           key: site-${{ hashFiles('**/*Rmd') }}
           restore-keys: site-
 
-      - name: Deploy to GitHub pages 🚀
-        uses: JamesIves/github-pages-deploy-action@4.1.4
-        with:
+      # Add new files in data and web folder, commit along with other modified files, push
+      - name: Commit files
+        run: |
+          git config --local user.name actions-user
+          git config --local user.email "actions@github.com"
+          git add data/*
+          git add web/*
+          git commit -am "GH ACTION Headlines $(date)"
+          git push origin main
+        env:
+          REPO_KEY: ${{secrets.GITHUB_TOKEN}}
+          username: github-actions
+
+      #- name: Deploy to GitHub pages 🚀
+      #  uses: JamesIves/github-pages-deploy-action@4.1.4
+      # with:
           branch: main
           folder: _site
