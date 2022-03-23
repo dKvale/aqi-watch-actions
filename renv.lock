@@ -114,6 +114,28 @@
         "gridExtra",
         "viridisLite"
       ]
+    },
+    "leaflet": {
+      "Package": "leaflet",
+      "Version": "2.1.0",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Hash": "6dfe956c509b92d7edee4f0f4bf42e64",
+      "Requirements": [
+        "RColorBrewer",
+        "base64enc",
+        "crosstalk",
+        "htmltools",
+        "htmlwidgets",
+        "leaflet.providers",
+        "magrittr",
+        "markdown",
+        "png",
+        "raster",
+        "scales",
+        "sp",
+        "viridis"
+      ]
     }
   }
 }
