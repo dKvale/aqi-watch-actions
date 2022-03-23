@@ -209,7 +209,7 @@ aqi <- arrange(ungroup(aqi), -AQI_Value)
 # Load previous aqi table
 #aqi_prev <- read_csv("data/aqi_previous.csv", col_types = c("ccccccdcdTT")) 
 
-aqi_prev <- readRDS("data/aqi_previous.csv") %>% 
+aqi_prev <- readRDS("data/aqi_previous.Rdata") %>% 
             filter(!is.na(AQI_Value))
 
 # Attach last AQI watch notification time
