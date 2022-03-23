@@ -42,14 +42,6 @@
         "yaml"
       ]
     },
-    "magrittr": {
-      "Package": "magrittr",
-      "Version": "2.0.2",
-      "Source": "Repository",
-      "Repository": "CRAN",
-      "Hash": "cdc87ecd81934679d1557633d8e1fe51",
-      "Requirements": []
-    },
     "markdown": {
       "Package": "markdown",
       "Version": "1.1",
@@ -111,35 +103,6 @@
         "yaml"
       ]
     },
-    "stringr": {
-      "Package": "stringr",
-      "Version": "1.4.0",
-      "Source": "Repository",
-      "Repository": "CRAN",
-      "Hash": "0759e6b6c0957edb1311028a49a35e76",
-      "Requirements": [
-        "glue",
-        "magrittr",
-        "stringi"
-      ]
-    },
-    "tibble": {
-      "Package": "tibble",
-      "Version": "3.1.6",
-      "Source": "Repository",
-      "Repository": "CRAN",
-      "Hash": "8a8f02d1934dfd6431c671361510dd0b",
-      "Requirements": [
-        "ellipsis",
-        "fansi",
-        "lifecycle",
-        "magrittr",
-        "pillar",
-        "pkgconfig",
-        "rlang",
-        "vctrs"
-      ]
-    },
     "viridis": {
       "Package": "viridis",
       "Version": "0.6.2",
@@ -151,14 +114,6 @@
         "gridExtra",
         "viridisLite"
       ]
-    },
-    "yaml": {
-      "Package": "yaml",
-      "Version": "2.3.5",
-      "Source": "Repository",
-      "Repository": "CRAN",
-      "Hash": "458bb38374d73bf83b1bb85e353da200",
-      "Requirements": []
     }
   }
 }
