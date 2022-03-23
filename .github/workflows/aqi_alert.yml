@@ -27,6 +27,12 @@ jobs:
 
       - uses: r-lib/actions/setup-renv@v1
       
+      - name: Query dependencies
+        run: |
+          install.packages('remotes')
+          saveRDS(remotes::dev_package_deps(dependencies = TRUE), ".github/depends.Rds", version = 2)
+        shell: Rscript {0}
+      
       - name: Install packages missed by renv
         run: |
           install.packages(c("rmarkdown", "pander", "readr", "stringr", "dplyr"))
