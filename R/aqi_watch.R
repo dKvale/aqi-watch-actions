@@ -157,7 +157,8 @@ aqi$local <- NULL
 #names(breaks_aqi) <- c("Rating", "Breakpoints", "OZONE", 
 #                      "PM25", "SO2", "CO", "NO2", "PM10")
 
-aqi <- group_by(aqi, AqsID, Parameter) %>% mutate(AQI_Value = round(conc2aqi(Concentration, Parameter)))
+aqi <- group_by(aqi, AqsID, Parameter) %>% 
+       mutate(AQI_Value = round(conc2aqi(Concentration, Parameter)))
 
 
 #-- Get missing sites from China Air Quality site - aqicn.org
@@ -206,7 +207,9 @@ aqi$Concentration <- ifelse(aqi$Concentration < -5, 0, aqi$Concentration)
 aqi <- arrange(ungroup(aqi), -AQI_Value)
 
 # Load previous aqi table
-aqi_prev <- read_csv("data/aqi_previous.csv", col_types = c("ccccccdcdTT")) %>% 
+#aqi_prev <- read_csv("data/aqi_previous.csv", col_types = c("ccccccdcdTT")) 
+
+aqi_prev <- readRDS("data/aqi_previous.csv") %>% 
             filter(!is.na(AQI_Value))
 
 # Attach last AQI watch notification time
