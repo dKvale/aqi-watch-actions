@@ -8,7 +8,8 @@ on:
   #  - cron:  '30 * * * *'  # At every 30 minutes past the hour
     
   # Triggers the workflow on push or pull request events but only for the main branch
-  [push]
+  push:
+    branches: [ main ]
 
 jobs:
   site:
@@ -62,21 +63,21 @@ jobs:
           source("R/aqi_watch.R")
         shell: Rscript {0} 
 
-      # # Add new files in data and web folder, commit along with other modified files, push
-      # - name: Commit files
-      #   run: |
-      #     git config --local user.name actions-user
-      #     git config --local user.email "actions@github.com"
-      #     git add data/*
-      #     git add web/*
-      #     git commit -am "GH ACTION Headlines $(date)"
-      #     git push origin main
-      #   env:
-      #     REPO_KEY: ${{secrets.GITHUB_TOKEN}}
-      #     username: github-actions
+      # Add new files in data and web folder, commit along with other modified files, push
+      - name: Commit files
+        run: |
+          git config --local user.name actions-user
+          git config --local user.email "actions@github.com"
+          git add data/*
+          git add web/*
+          git commit -am "GH ACTION Headlines $(date)"
+          git push origin main
+        env:
+          REPO_KEY: ${{secrets.GITHUB_TOKEN}}
+          username: github-actions
 
-      # #- name: Deploy to GitHub pages 🚀
-      # #  uses: JamesIves/github-pages-deploy-action@4.1.4
-      # # with:
-      #     branch: main
-      #     folder: _site
+      #- name: Deploy to GitHub pages 🚀
+      #  uses: JamesIves/github-pages-deploy-action@4.1.4
+      # with:
+          branch: main
+          folder: _site
