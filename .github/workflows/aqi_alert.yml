@@ -8,8 +8,8 @@ on:
   push:
     branches: 
       - main
-  schedule:
-      - cron:  '34 * * * *'  # At every 30 minutes past the hour
+  # schedule:
+      # - cron:  '34 * * * *'  # At every 30 minutes past the hour
     
 jobs:
   site:
@@ -58,14 +58,12 @@ jobs:
           source("R/aqi_watch.R")
         shell: Rscript {0} 
 
-      # Send alert if json file exists
-      - name: Send alert 📢 
-      - run: |
-          if [ ! -f "issue.json" ]; then
-            echo "No alert created."
-            exit 1
-          fi
-
+      - uses: JasonEtco/create-an-issue@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          labels: watch alerts
+          filename: issue.md
 
       # Add new files in data and web folder, commit along with other modified files, push
       - name: Commit website updates
