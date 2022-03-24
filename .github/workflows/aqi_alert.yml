@@ -58,22 +58,29 @@ jobs:
       #     source("R/aqi_watch.R")
       #   shell: Rscript {0} 
 
+      - name: Check issue.md existence
+        id: check_files
+        uses: andstor/file-existence-action@v1
+        with:
+          files: "issue.md"
+
       - uses: JasonEtco/create-an-issue@v2
+        if: steps.check_files.outputs.files_exists == 'true'
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           labels: watch alerts
           filename: issue.md
 
-      # Add new files in data and web folder, commit along with other modified files, push
-      - name: Commit website updates
-        run: |
-          git config --local user.name actions-user
-          git config --local user.email "actions@github.com"
-          git add data/*
-          git add web/*
-          git commit -am "GH ACTION Headlines $(date)"
-          git push origin main
-        env:
-          REPO_KEY: ${{secrets.GITHUB_TOKEN}}
-          username: github-actions
+      # # Add new files in data and web folder, commit along with other modified files, push
+      # - name: Commit website updates
+      #   run: |
+      #     git config --local user.name actions-user
+      #     git config --local user.email "actions@github.com"
+      #     git add data/*
+      #     git add web/*
+      #     git commit -am "GH ACTION Headlines $(date)"
+      #     git push origin main
+      #   env:
+      #     REPO_KEY: ${{secrets.GITHUB_TOKEN}}
+      #     username: github-actions
