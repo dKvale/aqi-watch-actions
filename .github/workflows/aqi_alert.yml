@@ -70,9 +70,3 @@ jobs:
         env:
           REPO_KEY: ${{secrets.GITHUB_TOKEN}}
           username: github-actions
-
-      #- name: Deploy to GitHub pages 🚀
-      #  uses: JamesIves/github-pages-deploy-action@4.1.4
-      # with:
-      #    branch: main
-      #    folder: _site
