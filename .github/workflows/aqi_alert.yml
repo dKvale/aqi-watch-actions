@@ -4,7 +4,6 @@ name: aqi_alert
 
 # Controls when the workflow will run
 on:
-
   #schedule:
   #  - cron:  '30 * * * *'  # At every 30 minutes past the hour
     
@@ -47,15 +46,10 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-renv-
 
-      - name: Install renv
+      - name: Restore packages
         shell: Rscript {0}
         run: |
           install.packages("renv")
-       
-      - name: Restore packages
-        shell: Rscript {0}
-        if: steps.cache-renv.outputs.cache-hit != 'true'
-        run: |
           renv::restore()
           
       - name: Install packages missed by renv
