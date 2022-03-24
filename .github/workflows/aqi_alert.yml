@@ -47,24 +47,19 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-renv-
 
-      - name: Restore packages
+      - name: Restore R packages from cache
         shell: Rscript {0}
         run: |
           install.packages("renv")
           renv::restore()
-          
-      - name: Install packages missed by renv
-        run: |
-          install.packages(c("formattable"))
-        shell: Rscript {0}
 
-      - name: Check AQI
+      - name: Get current AQI monitor results
         run: |
           source("R/aqi_watch.R")
         shell: Rscript {0} 
 
       # Add new files in data and web folder, commit along with other modified files, push
-      - name: Commit files
+      - name: Commit website updates
         run: |
           git config --local user.name actions-user
           git config --local user.email "actions@github.com"
