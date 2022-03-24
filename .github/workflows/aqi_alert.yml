@@ -63,13 +63,6 @@ jobs:
           source("R/aqi_watch.R")
         shell: Rscript {0} 
 
-      - name: Cache site results
-        uses: actions/cache@v2
-        with:
-          path: web
-          key: site-${{ hashFiles('**/*Rmd') }}
-          restore-keys: site-
-
       # Add new files in data and web folder, commit along with other modified files, push
       - name: Commit files
         run: |
