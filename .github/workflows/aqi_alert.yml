@@ -58,6 +58,15 @@ jobs:
           source("R/aqi_watch.R")
         shell: Rscript {0} 
 
+      # Send alert if json file exists
+      - name: Send alert 📢 
+      - run: |
+          if [ ! -f "issue.json" ]; then
+            echo "No alert created."
+            exit 1
+          fi
+
+
       # Add new files in data and web folder, commit along with other modified files, push
       - name: Commit website updates
         run: |
