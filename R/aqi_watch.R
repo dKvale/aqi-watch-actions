@@ -454,7 +454,7 @@ if(watch_time) {
                              credentials$issue_token,
                              '\" -d @issue.json https://api.github.com/repos/dKvale/aqi-watch/issues')
         
-        system(send_issue)
+        #system(send_issue)
         
         #Save alert time
         names(watch)[11] <- as.character(Sys.time() + 61)
