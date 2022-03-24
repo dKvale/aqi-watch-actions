@@ -16,14 +16,19 @@ jobs:
     runs-on: ubuntu-latest
     env:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
-      RENV_PATHS_ROOT: ~/.local/share/renv
 
     steps:
       - uses: actions/checkout@v2
+      - name: Set RENV_PATHS_ROOT
+        shell: bash
+        run: |
+          echo "RENV_PATHS_ROOT=${{ runner.temp }}/renv" >> $GITHUB_ENV
+
       - uses: r-lib/actions/setup-pandoc@v2
       
       - uses: r-lib/actions/setup-r@v2
         with:
+          r-version: '4.1.2'
           use-public-rspm: false
           
       - name: "[Stage] [Linux] Install required system libs"
@@ -34,23 +39,20 @@ jobs:
         if: runner.os == 'Linux'
         run: sudo apt-get install libgdal-dev libproj-dev libgeos-dev libudunits2-dev    
         
-      - uses: actions/cache@v1
+      - uses: actions/cache@v3
+        id: cache-renv
         with:
           path: ${{ env.RENV_PATHS_ROOT }}
           key: ${{ runner.os }}-renv-${{ hashFiles('**/renv.lock') }}
           restore-keys: |
             ${{ runner.os }}-renv-
-            
+
       - name: Restore packages
         shell: Rscript {0}
         run: |
-          if (!requireNamespace("renv", quietly = TRUE)) install.packages("renv")
+          install.packages("renv")
           renv::restore()
           
-      #- uses: r-lib/actions/setup-renv@v2
-      #  with:
-      #    cache-version: 2
-      
       - name: Install packages missed by renv
         run: |
           install.packages(c("formattable"))
@@ -60,13 +62,6 @@ jobs:
         run: |
           source("R/aqi_watch.R")
         shell: Rscript {0} 
-
-      - name: Cache site results
-        uses: actions/cache@v2
-        with:
-          path: web
-          key: site-${{ hashFiles('**/*Rmd') }}
-          restore-keys: site-
 
       # Add new files in data and web folder, commit along with other modified files, push
       - name: Commit files
