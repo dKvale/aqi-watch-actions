@@ -14,7 +14,7 @@ options(rstudio.markdownToHTML =
 
 source("R/aqi_convert.R")
 
-email_trigger <- 90
+email_trigger <- 10
 pm10_trigger  <- 130
 
 # Email alert subscribers
