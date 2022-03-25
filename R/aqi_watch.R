@@ -17,7 +17,7 @@ options(rstudio.markdownToHTML =
 
 source("R/aqi_convert.R")
 
-email_trigger <- 91
+email_trigger <- 20#91
 pm10_trigger  <- 130
 
 # Email alert subscribers
@@ -344,7 +344,6 @@ if (local_hr > 7) {
   }
 }
 
-
 ########################################################################
 #  AQI model performance -- Obtain AQI model performance data.  Updated
 #  once per day.
@@ -398,11 +397,6 @@ if(watch_time) {
   
   watch <- filter(watch, grepl('Minnesota', Agency) | AqsID %in% c(border_sites, extra_sites))
   
-  
-  ## Drop PM10 from previous alert list to 
-  ## ensure PM2.5 and Ozone alerts go out?
-  #watch <- filter(watch, Parameter != "PM10")
-  #aqi_prev <- filter(aqi_prev, Parameter != "PM10")
   if (nrow(watch) > 0) {
     
     if (as.numeric(difftime(names(watch)[10], names(aqi_prev)[11], units = "hours")) > .9) {
@@ -410,16 +404,14 @@ if(watch_time) {
       if ((sum(!watch$AqsID %in% aqi_prev$AqsID) > 0) || 
           as.numeric(difftime(names(watch)[10], names(aqi_prev)[11], units = "hours")) > 1.9) {
         
-        
         watch$Agency <- gsub("Minnesota Pollution Control Agency", "MPCA", watch$Agency)
         
         max_site <- filter(watch, AQI_Value == max(watch$AQI_Value, na.rm = T))[1, ]
         
-        # Commit to github 
-        git <- "cd ~/aqi-watch & git "
-        
-        system(paste0(git, "config --global user.name dkvale"))
-        system(paste0(git, "config --global user.email ", credentials$email))          
+        # Commit issue to github 
+        #git <- "cd ~/aqi-watch & git "
+        #system(paste0(git, "config --global user.name dkvale"))
+        #system(paste0(git, "config --global user.email ", credentials$email))          
         
         if (sum(unique(watch$AqsID) %in% mn_sites$AqsID) < 1) {
           VIP_list <- ""
@@ -438,24 +430,17 @@ if(watch_time) {
                                " was reported at **", max_site$'Site Name',
                                "** (", max_site$Agency, 
                                ")&#46; For more details visit the <a href=http://mpca-air&#46;github&#46;io/aqi-watch> AQI Watch</a>&#46; </br>",
-                               "_", format(Sys.time(), "%h %d, %Y at %H:%M"), " CDT_ </br> </br>",
-                               VIP_list)
+                               "_", format(Sys.time(), "%h %d, %Y at %H:%M"), " CDT_ </br> </br>") #,
+                               #VIP_list)
         
-        issue <- paste0('{\n\t"title": "', message_title, 
-                        '", \n\t"body": "', message_text,
-                        '", \n\t"labels": ["watch alerts"]\n}')
+        issue <- paste0('---\ntitle: ', message_title, '\n',
+                        'labels: watch_alerts',
+                        '\n---\n\n', 
+                        message_text)
         
-        # Save issue to JSON file
-        cat(issue, file = "issue.json") 
-        
-        # Create batch file
-        send_issue <- paste0('cd ~/aqi-watch; curl ', 
-                             '-i -H "Authorization: token ', 
-                             credentials$issue_token,
-                             '\" -d @issue.json https://api.github.com/repos/dKvale/aqi-watch/issues')
-        
-        #system(send_issue)
-        
+        # Save issue to markdown file
+        cat(issue, file = "issue.md") 
+       
         #Save alert time
         names(watch)[11] <- as.character(Sys.time() + 61)
         
