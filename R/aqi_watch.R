@@ -367,7 +367,8 @@ aqi_models <- left_join(aqi_models, mn_sites_uniq, by = c("site_catid"="AqsID"))
 # Set issue notification to sleep from 10 pm to 4 am CDT 
 watch_time <- (local_hr < 22) && (local_hr > 4)
 
-#cat("test", file = "issue.md") 
+print(watch_time)
+print(local_hr)
 
 if (watch_time) { 
   
@@ -378,8 +379,14 @@ if (watch_time) {
   
   watch <- filter(watch, grepl('Minnesota', Agency) | AqsID %in% c(border_sites, extra_sites))
   
+  print(nrow(watch))        
+          
   if (nrow(watch) > 0) {
     
+    print(names(aqi_prev)[11])
+    print(names(watch)[10])
+    print(difftime(names(watch)[10], names(aqi_prev)[11], units = "hours"))
+            
     if (as.numeric(difftime(names(watch)[10], names(aqi_prev)[11], units = "hours")) > .9) {
       
       if ((sum(!watch$AqsID %in% aqi_prev$AqsID) > 0) || 
