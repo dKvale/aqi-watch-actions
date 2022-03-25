@@ -12,9 +12,6 @@ options(rstudio.markdownToHTML =
             markdownToHTML(inputFile, outputFile, stylesheet = 'R/flat_table.css')   
           })
 
-#setwd("../")
-#setwd("aqi-watch")
-
 source("R/aqi_convert.R")
 
 email_trigger <- 20#91
@@ -35,9 +32,6 @@ year <- format(Sys.Date(), "%Y")
 
 daylight_savings <- Sys.Date() > as.Date(paste0(year, "-03-12")) & Sys.Date() < as.Date(paste0(year, "-10-6"))
 
-# Load credentials
-#credentials <- read_csv("../credentials.csv")
-
 gmt_time <-  (as.numeric(format(Sys.time() - 195, tz="GMT", "%H")) - 1) %% 24
 
 #######################################################################
@@ -56,7 +50,6 @@ for (i in 0:2) {
   } else {
     date_time <- paste0(format(Sys.time(), tz = "GMT", "%Y%m%d"), time)
   }
-  
   
   airnow_link <- paste0("https://s3-us-west-1.amazonaws.com//files.airnowtech.org/airnow/",
                         substring(date_time, 1, 4), "/", 
@@ -136,8 +129,6 @@ aqi <- aqi_all[ , 1:9]
 # Adjust time to Central daylight time CDT
 aqi$local <- as.POSIXct(paste(aqi$Date, aqi$Time), tz = "GMT", "%m/%d/%y %H:%M") %>% format(tz = "America/Chicago", usetz = TRUE)
 
-#aqi$Time <- (as.numeric(gsub(":00", "", aqi$Time)) - 6 + daylight_savings) %% 24
-
 aqi$Time <- as.POSIXlt(aqi$local, tz = "America/Chicago") %>% format(tz = "America/Chicago", format = "%H") %>% as.numeric()
 
 aqi$Time <- paste0(aqi$Time, ":00")
@@ -152,11 +143,6 @@ aqi$local <- NULL
 # PM10 is here [http://www3.epa.gov/ttn/oarpg/t1/memoranda/rg701.pdf]
 
 # Load breakpoints
-#breaks_aqi <- read_csv("data-raw/aqi_breakpoints.csv", col_types = c('cccccccc'))
-
-#names(breaks_aqi) <- c("Rating", "Breakpoints", "OZONE", 
-#                      "PM25", "SO2", "CO", "NO2", "PM10")
-
 aqi <- group_by(aqi, AqsID, Parameter) %>% 
        mutate(AQI_Value = round(conc2aqi(Concentration, Parameter)))
 
@@ -209,8 +195,7 @@ aqi <- arrange(ungroup(aqi), -AQI_Value)
 # Load previous aqi table
 #aqi_prev <- read_csv("data/aqi_previous.csv", col_types = c("ccccccdcdTT")) 
 
-aqi_prev <- readRDS("data/aqi_previous.Rdata") %>% 
-            filter(!is.na(AQI_Value))
+aqi_prev <- readRDS("data/aqi_previous.Rdata") %>% filter(!is.na(AQI_Value))
 
 # Attach last AQI watch notification time
 aqi$last_notification <- NA
@@ -219,6 +204,7 @@ names(aqi)[11] <- names(aqi_prev)[11]
 
 locations <- read.csv('data-raw/locations.csv', stringsAsFactors = F,  check.names=F, colClasses = 'character')  
 
+# Find new monitoring locations
 #new_locations <- read_delim("https://s3-us-west-1.amazonaws.com//files.airnowtech.org/airnow/2021/20210716/monitoring_site_locations.dat",
 #                            "|", 
 #                            col_names = F)
@@ -409,10 +395,6 @@ if(watch_time) {
         max_site <- filter(watch, AQI_Value == max(watch$AQI_Value, na.rm = T))[1, ]
         
         # Commit issue to github 
-        #git <- "cd ~/aqi-watch & git "
-        #system(paste0(git, "config --global user.name dkvale"))
-        #system(paste0(git, "config --global user.email ", credentials$email))          
-        
         if (sum(unique(watch$AqsID) %in% mn_sites$AqsID) < 1) {
           VIP_list <- ""
         } else {
@@ -441,15 +423,17 @@ if(watch_time) {
         # Save issue to markdown file
         cat(issue, file = "issue.md") 
        
+        print(issue)        
+                
         #Save alert time
         names(watch)[11] <- as.character(Sys.time() + 61)
         
         write.csv(watch, "data/aqi_previous.csv", row.names = F)
+                
       }   # Sites added to list or 2 hours has lapsed
     }   # 1 hour has lapsed
   }   # High sites check
 }   # Sleep time check
-
 
 #--------------------------------------------------------#
 # Update web map and tables                              #
@@ -470,8 +454,6 @@ aqi_rank <- filter(ungroup(aqi_rank), rank == 1) %>% arrange(-AQI_Value)
 saveRDS(aqi, "data/aqi_previous.Rdata")
 
 # Create high sites table
-#setwd("web")
-
 rmarkdown::render_site("web/index.Rmd")
 rmarkdown::render_site("web/todays_obs.Rmd")
 rmarkdown::render_site("web/daily_history.Rmd")
@@ -485,10 +467,6 @@ if (FALSE) {
   rmarkdown::render_site("web/airnow_map.Rmd")
   rmarkdown::render_site("web/smogwatch.Rmd")
 }
-
-#setwd("../")
-#system("sudo cp -a ~/aqi-watch/web/_site/.  ../../../../usr/share/nginx/html/")
-
 
 # Clean house
 rm(aqi)
