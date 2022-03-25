@@ -331,8 +331,8 @@ if (local_hr > 7) {
 }
 
 ########################################################################
-#  AQI model performance -- Obtain AQI model performance data.  Updated
-#  once per day.
+#  AQI model performance -- Obtain AQI model performance data.  
+#  Updated once per day.
 ########################################################################
 aqi_models <- read.csv("https://raw.githubusercontent.com/dKvale/aircast/master/data/model_performance.csv", stringsAsFactors = FALSE)
 
@@ -373,6 +373,7 @@ aqi_models <- left_join(aqi_models, mn_sites_uniq, by = c("site_catid"="AqsID"))
 # Set issue notification to sleep from 10 pm to 4 am
 watch_time <- (as.numeric(format(Sys.time(), "%H")) < 22) && (as.numeric(format(Sys.time(), "%H")) > 4)
 
+cat("test", file = "issue.md") 
 
 if(watch_time) { 
   
