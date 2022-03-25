@@ -14,7 +14,7 @@ options(rstudio.markdownToHTML =
 
 source("R/aqi_convert.R")
 
-email_trigger <- 20#91
+email_trigger <- 90
 pm10_trigger  <- 130
 
 # Email alert subscribers
@@ -137,7 +137,6 @@ aqi$Date <-  as.POSIXlt(aqi$local, tz = "America/Chicago") %>% as.Date() %>% for
 
 aqi$local <- NULL
 
-
 # Calculate AQI value using EPA breakpoints 
 # [www.pca.state.mn.us/index.php/air/air-quality-and-pollutants/general-air-quality/air-quality-index/air-quality-about-the-data.html]
 # PM10 is here [http://www3.epa.gov/ttn/oarpg/t1/memoranda/rg701.pdf]
@@ -145,7 +144,6 @@ aqi$local <- NULL
 # Load breakpoints
 aqi <- group_by(aqi, AqsID, Parameter) %>% 
        mutate(AQI_Value = round(conc2aqi(Concentration, Parameter)))
-
 
 #-- Get missing sites from China Air Quality site - aqicn.org
 source("R/get_aqicn.R")
@@ -259,7 +257,7 @@ forecast_sites_ozone <- filter(mn_sites, Parameter == "OZONE", AqsID != "2713700
 # Load daily history
 daily_history <- readRDS("data/daily_history.Rdata")
 
-# If it's after 7 AM, check the most recent day and download yesterday's data if not in the history.
+# If it's after 7 AM local time, check the most recent day and download yesterday's data if not in the history.
 local_hr <- as.numeric(format(Sys.time(), tz = "America/Chicago", "%H"))
 
 today_date <- as.Date(Sys.time(), tz = "America/Chicago")
@@ -366,8 +364,8 @@ aqi_models <- left_join(aqi_models, mn_sites_uniq, by = c("site_catid"="AqsID"))
 ## And if a new site has been added to the list
 ## or if it has been over 2 hours since the last issued alert
 
-# Set issue notification to sleep from 10 pm to 4 am CDT ||  10am - 2am UTC
-watch_time <- (as.numeric(format(Sys.time(), "%H")) <= 24) && (as.numeric(format(Sys.time(), "%H")) > 10)
+# Set issue notification to sleep from 10 pm to 4 am CDT 
+watch_time <- (local_hr < 22) && (local_hr > 4)
 
 #cat("test", file = "issue.md") 
 
@@ -422,7 +420,7 @@ if (watch_time) {
        
         print(issue)        
                 
-        #Save alert time
+        # Save alert time
         names(watch)[11] <- as.character(Sys.time() + 61)
         
         write.csv(watch, "data/aqi_previous.csv", row.names = F)
