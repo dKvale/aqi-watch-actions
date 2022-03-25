@@ -217,7 +217,6 @@ locations <- locations %>%
                                             "840550790068",
                                             "840551270006",
                                             "840460130004"
-                                            
                                             ), 
                                   "Site Name" = c("Lake Ilo",
                                                   "SF-USD",
@@ -225,7 +224,6 @@ locations <- locations %>%
                                                   "Milwaukee-UWM UPark", 
                                                   "Elkhorn",
                                                   "Aberdeen"
-                                                  
                                                   ),
                                   Lat   = c("47.34259",
                                             "43.59901",
@@ -254,10 +252,9 @@ forecast_sites_pm25 <- filter(mn_sites, Parameter == "PM25")
 
 forecast_sites_ozone <- filter(mn_sites, Parameter == "OZONE", AqsID != "271370034")
 
-########################################################################
-#  Daily AQI data -- Obtain the previous day's data once per day and
-#  add to daily history.
-########################################################################
+###########################################################################################
+#  Daily AQI data -- Obtain the previous day's data once per day and add to daily history.
+###########################################################################################
 
 # Load daily history
 daily_history <- readRDS("data/daily_history.Rdata")
@@ -289,6 +286,7 @@ if (local_hr > 7) {
                      silent = T)
     
     if ( !is.data.frame(aqi_daily) || nrow(aqi_daily) < 1 ) {
+              
       errs <- read.csv("log/error_log.csv", stringsAsFactors = F)
       
       err_time <- as.character(format(Sys.time(), tz = "America/Chicago"))
@@ -317,7 +315,6 @@ if (local_hr > 7) {
       aqi_daily <- mutate(aqi_daily, AQI_Value = conc2aqi(Concentration,Parameter))
       
       daily_history <- rbind(daily_history, aqi_daily)
-      
     }
     
     # Remove any data older than one week.
@@ -362,20 +359,19 @@ mn_sites_uniq <- mn_sites[,c("AqsID","Site Name")] %>% unique()
 
 aqi_models <- left_join(aqi_models, mn_sites_uniq, by = c("site_catid"="AqsID"))
 
-
 #--------------------------------------------------------#
 # Send Alert                                             #
 #--------------------------------------------------------#
-# Create issue if exceedances found for a criteria pollutant
+## Create issue if exceedances found for a criteria pollutant
 ## And if a new site has been added to the list
 ## or if it has been over 2 hours since the last issued alert
 
-# Set issue notification to sleep from 10 pm to 4 am
-watch_time <- (as.numeric(format(Sys.time(), "%H")) < 22) && (as.numeric(format(Sys.time(), "%H")) > 4)
+# Set issue notification to sleep from 10 pm to 4 am CDT ||  10am - 2am UTC
+watch_time <- (as.numeric(format(Sys.time(), "%H")) <= 24) && (as.numeric(format(Sys.time(), "%H")) > 10)
 
-cat("test", file = "issue.md") 
+#cat("test", file = "issue.md") 
 
-if(watch_time) { 
+if (watch_time) { 
   
   # Remove: low concentrations, and outstate monitors
   watch <- filter(aqi, AQI_Value > email_trigger) 
