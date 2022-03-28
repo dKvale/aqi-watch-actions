@@ -9,7 +9,7 @@ on:
     branches: 
       - main
   schedule:
-      - cron:  '34 * * * *'  # At every 30 minutes past the hour
+      - cron:  '34 * * * *'  # At every 34 minutes past the hour
     
 jobs:
   site:
