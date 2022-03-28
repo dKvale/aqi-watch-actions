@@ -186,7 +186,6 @@ aqi$AQI_Value     <- ifelse(aqi$AQI_Value < 0, 0, aqi$AQI_Value)
 
 aqi$Concentration <- ifelse(aqi$Concentration < -5, 0, aqi$Concentration)
 
-
 # Arrange from high to low
 aqi <- arrange(ungroup(aqi), -AQI_Value)
 
@@ -414,8 +413,8 @@ if (watch_time) {
                                " was reported at **", max_site$'Site Name',
                                "** (", max_site$Agency, 
                                ")&#46; For more details visit the <a href=http://mpca-air&#46;github&#46;io/aqi-watch> AQI Watch</a>&#46; </br>",
-                               "_", format(Sys.time(), "%h %d, %Y at %H:%M"), " CDT_ </br> </br>") #,
-                               #VIP_list)
+                               "_", format(Sys.time(), "%h %d, %Y at %H:%M"), " CDT_ </br> </br>"),
+                               VIP_list)
         
         issue <- paste0('---\ntitle: ', message_title, '\n',
                         'labels: watch_alerts',
